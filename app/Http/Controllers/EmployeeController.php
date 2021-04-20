@@ -78,6 +78,7 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
+        $this->decrementTotalBenefitCost($employee->benefit_cost);
         $employee->delete();
 
         return redirect(route('employee.index'));
@@ -102,5 +103,10 @@ class EmployeeController extends Controller
     protected function incrementTotalBenefitCost(int $amount) {
         if (Cache::has('totalBenefitCost')) Cache::increment('totalBenefitCost', $amount);
         else Cache::forever('totalBenefitCost', $amount);
+    }
+
+    protected function decrementTotalBenefitCost(int $amount) {
+        if (Cache::has('totalBenefitCost')) Cache::decrement('totalBenefitCost', $amount);
+        else Cache::forever('totalBenefitCost', 0);
     }
 }

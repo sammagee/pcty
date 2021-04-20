@@ -15,8 +15,8 @@ class CreateDependentsTable extends Migration
     {
         Schema::create('dependents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('team_id')->constrained();
-            $table->foreignId('employee_id')->constrained();
+            $table->foreignId('team_id')->constrained()->onDelete('cascade');
+            $table->foreignId('employee_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->enum('relation', ['spouse', 'child', 'other'])->default('other');
             $table->timestamps();

@@ -17,5 +17,5 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/', [EmployeeController::class, 'index'])->name('employee.index');
     Route::post('employees', [EmployeeController::class, 'store'])->name('employee.store');
-    Route::delete('employees/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
+    Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 });
