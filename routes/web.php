@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/', [EmployeeController::class, 'index'])->name('employee.index');
+    Route::post('employees', [EmployeeController::class, 'store'])->name('employee.store');
+    Route::delete('employees/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 });
