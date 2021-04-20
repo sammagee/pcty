@@ -18,11 +18,12 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         $team = $request->user()->currentTeam;
-        $totalBenefitCost = Cache::has('totalBenefitCost') ? Cache::get('totalBenefitCost') : 0;
-        $employeeCount = Employee::all()->count();
+        $totalBenefitCost = Cache::has('total_benefit_cost:'.$team->id) ? Cache::get('total_benefit_cost:'.$team->id) : 0;
+        $employees = $team->employees();
+        $employeesCount = $employees->count();
 
         return Inertia::render('Employees', [
-            'employees' => $team->employees()
+            'employees' => $employees
                 ->with('dependents')
                 ->orderBy('name')
                 ->paginate()
@@ -35,7 +36,7 @@ class EmployeeController extends Controller
                         'dependents' => $employee->dependents,
                     ];
                 }),
-            'average' => $employeeCount > 0 ? $totalBenefitCost / $employeeCount : $totalBenefitCost,
+            'average' => $employeesCount > 0 ? $totalBenefitCost / $employeesCount : $totalBenefitCost,
             'total' => $totalBenefitCost,
         ]);
     }
@@ -53,7 +54,7 @@ class EmployeeController extends Controller
         $employee = $team->employees()->create(['name' => $validated['name'], 'benefit_cost' => $this->benefitCost(1000, $validated['name'])]);
         $employee->benefit_cost += $this->createDependents($employee, $validated['dependents']);
         $employee->save();
-        $this->incrementTotalBenefitCost($employee->benefit_cost);
+        $this->incrementTotalBenefitCost($team->id, $employee->benefit_cost);
 
         return redirect(route('employee.index'));
     }
@@ -78,7 +79,7 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
-        $this->decrementTotalBenefitCost($employee->benefit_cost);
+        $this->decrementTotalBenefitCost($employee->team_id, $employee->benefit_cost);
         $employee->delete();
 
         return redirect(route('employee.index'));
@@ -100,13 +101,15 @@ class EmployeeController extends Controller
         return $amount * $multiplier;
     }
 
-    protected function incrementTotalBenefitCost(int $amount) {
-        if (Cache::has('totalBenefitCost')) Cache::increment('totalBenefitCost', $amount);
-        else Cache::forever('totalBenefitCost', $amount);
+    protected function incrementTotalBenefitCost($id, int $amount) {
+        $key = 'total_benefit_cost:'.$id;
+        if (Cache::has($key)) Cache::increment($key, $amount);
+        else Cache::forever($key, $amount);
     }
 
-    protected function decrementTotalBenefitCost(int $amount) {
-        if (Cache::has('totalBenefitCost')) Cache::decrement('totalBenefitCost', $amount);
-        else Cache::forever('totalBenefitCost', 0);
+    protected function decrementTotalBenefitCost($id, int $amount) {
+        $key = 'total_benefit_cost:'.$id;
+        if (Cache::has($key)) Cache::decrement($key, $amount);
+        else Cache::forever($key, 0);
     }
 }
