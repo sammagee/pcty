@@ -22,8 +22,8 @@ class EmployeeController extends Controller
         $employeesCount = $team->employees()->count();
 
         return Inertia::render('Employees', [
-            'search' => $request->search,
-            'employees' => Employee::search($request->search)
+            'search' => $request->query('query'),
+            'employees' => Employee::search($request->query('query'),)
                 ->where('team_id', $team->id)
                 ->orderBy('name')
                 ->query(fn ($employee) => $employee->with('dependents'))

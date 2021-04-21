@@ -125,7 +125,7 @@
 
             const search = throttle(() => {
                 Inertia.get(
-                    route('employee.index', query.value ? { search: query.value } : {}),
+                    route('employee.index', query.value ? { query: query.value } : {}),
                     {},
                     { preserveState: true }
                 )
