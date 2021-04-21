@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Scout\Searchable;
 
 class Employee extends Model
 {
     use HasFactory;
     use HasProfilePhoto;
+    use Searchable;
 
     protected $guarded = [];
 

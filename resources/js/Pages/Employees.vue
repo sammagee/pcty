@@ -18,7 +18,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
 
-                        <input class="w-full h-16 pr-16 border-0 rounded-lg shadow pl-14 focus:ring-2 focus:ring-offset-gray-100 focus:ring-offset-2 focus:outline-none focus:ring-blue-300" type="text" placeholder="Search" ref="search" />
+                        <input class="w-full h-16 pr-16 placeholder-gray-400 transition border border-white rounded-lg shadow focus:border-blue-400 pl-14 focus:ring-2 focus:ring-offset-gray-100 focus:ring-offset-2 focus:outline-none focus:ring-blue-300" type="text" placeholder="Search" ref="searchInput" :value="query" @input="[query = $event.target.value, search()]" />
 
                         <span class="absolute inline-flex items-center justify-center w-6 h-6 text-xs text-gray-500 border border-gray-100 rounded right-6 bg-gray-50">/</span>
                     </div>
@@ -32,7 +32,7 @@
                         </h3>
                     </div>
 
-                    <div class="flex flex-col justify-center h-16 px-6 rounded-lg shadow md:items-center md:space-x-3 md:justify-between md:flex-row bg-gradient-to-br from-blue-300 to-blue-400">
+                    <div class="flex flex-col justify-center h-16 px-6 rounded-lg shadow md:items-center md:space-x-3 md:justify-between md:flex-row bg-gradient-to-br from-gray-700 to-gray-900">
                         <span class="text-xs font-semibold tracking-wide text-white uppercase">
                             Total<br />
                         </span>
@@ -83,6 +83,8 @@
                         <p class="text-sm">No Employees</p>
                     </div>
                 </div>
+
+                <pagination class="mt-6" :links="employees.links" />
             </div>
         </div>
 
@@ -94,29 +96,44 @@
     import AppLayout from '@/Layouts/AppLayout'
     import EmployeeModal from '@/Shared/EmployeeModal'
     import JetButton from '@/Jetstream/Button'
+    import Pagination from '@/Shared/Pagination'
     import { ref } from '@vue/reactivity'
     import { Inertia } from '@inertiajs/inertia'
     import { onMounted, onUnmounted } from '@vue/runtime-core'
     import hotkeys from 'hotkeys-js'
+    import throttle from 'lodash/throttle'
 
     export default {
-        props: ['employees', 'average', 'total'],
+        props: ['employees', 'average', 'total', 'search'],
 
         components: {
             AppLayout,
             EmployeeModal,
             JetButton,
+            Pagination,
         },
 
-        setup() {
-            const search = ref(null)
+        setup(props) {
+            const query = ref(props.search)
+            const searchInput = ref(null)
             const showingEmployeeModal = ref(false)
-            const deleteEmployee = employee => Inertia.delete(route('employee.destroy', employee.id))
             const selectedEmployee = ref(null)
+
+            const deleteEmployee = employee => {
+                if (confirm('Are you sure you want to delete this employee?')) Inertia.delete(route('employee.destroy', employee.id))
+            }
+
+            const search = throttle(() => {
+                Inertia.get(
+                    route('employee.index', query.value ? { search: query.value } : {}),
+                    {},
+                    { preserveState: true }
+                )
+            }, 150);
 
             onMounted(() => {
                 hotkeys('/', event => {
-                    search.value?.focus()
+                    searchInput.value?.focus()
                     event.preventDefault()
                 })
             })
@@ -125,7 +142,7 @@
                 hotkeys.unbind('/')
             })
 
-            return { search, showingEmployeeModal, deleteEmployee, selectedEmployee }
+            return { query, search, searchInput, showingEmployeeModal, deleteEmployee, selectedEmployee }
         }
     }
 </script>

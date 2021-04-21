@@ -23,7 +23,7 @@
                     </div>
 
                     <div>
-                        <select v-model="dependent.relation" class="border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <select v-model="dependent.relation" class="transition border-gray-300 rounded-md shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-white">
                             <option value="" selected disabled>Relation</option>
                             <option value="spouse">Spouse</option>
                             <option value="child">Child</option>

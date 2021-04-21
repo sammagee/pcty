@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
@@ -20,23 +19,23 @@ class EmployeeController extends Controller
     {
         $team = $request->user()->currentTeam;
         $totalBenefitCost = $this->getTotalBenefitCost($team);
-        $employees = $team->employees();
-        $employeesCount = $employees->count();
+        $employeesCount = $team->employees()->count();
 
         return Inertia::render('Employees', [
-            'employees' => $employees
-                ->with('dependents')
+            'search' => $request->search,
+            'employees' => Employee::search($request->search)
+                ->where('team_id', $team->id)
                 ->orderBy('name')
-                ->paginate()
-                ->through(function ($employee) {
-                    return [
-                        'id' => $employee->id,
-                        'name' => $employee->name,
-                        'benefit_cost' => $employee->benefit_cost,
-                        'profile_photo_url' => $employee->profile_photo_url,
-                        'dependents' => $employee->dependents,
-                    ];
-                }),
+                ->query(fn ($employee) => $employee->with('dependents'))
+                ->paginate(1)
+                ->withQueryString()
+                ->through(fn ($employee) => [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'benefit_cost' => $employee->benefit_cost,
+                    'profile_photo_url' => $employee->profile_photo_url,
+                    'dependents' => $employee->dependents,
+                ]),
             'average' => $employeesCount > 0 ? $totalBenefitCost / $employeesCount : $totalBenefitCost,
             'total' => $totalBenefitCost,
         ]);
