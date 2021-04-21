@@ -24,5 +24,8 @@
         "tailwindcss": "^2.1.1",
         "vue": "^3.0.5",
         "vue-loader": "^16.1.2"
+    },
+    "dependencies": {
+        "hotkeys-js": "^3.8.3"
     }
 }

@@ -50,4 +50,13 @@ class Team extends JetstreamTeam
     public function employees() {
         return $this->hasMany(Employee::class);
     }
+
+    /**
+     * Get all of the team's dependents
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dependents() {
+        return $this->hasMany(Dependent::class);
+    }
 }

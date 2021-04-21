@@ -1,7 +1,7 @@
 <template>
     <jet-dialog-modal :show="show" @close="$emit('close')">
         <template #title>
-            Add Employee
+            {{ title }} Employee
         </template>
 
         <template #content>
@@ -14,10 +14,9 @@
             <hr class="my-6" />
 
             <div>
-                <div v-if="form.dependents.length" v-for="dependent in form.dependents" class="flex items-center mb-2 space-x-3">
+                <div v-if="form.dependents.length" v-for="(dependent, index) in form.dependents" :key="index" class="flex items-center mb-2 space-x-3">
                     <div class="flex-1">
                         <jet-input type="text" class="w-full" placeholder="Dependent Name"
-                            ref="name"
                             v-model="dependent.name" />
 
                         <jet-input-error :message="form.errors.name" class="mt-2" />
@@ -31,9 +30,15 @@
                             <option value="other">Other</option>
                         </select>
                     </div>
+
+                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" @click="form.dependents.splice(index, 1)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
 
-                <jet-button @click="addDependent" :class="['mt-2', { 'opacity-25': form.processing }]" :disabled="form.processing">
+                <jet-button @click="addDependent" :class="{ 'mt-2': form.dependents.length, 'opacity-25': form.processing }" :disabled="form.processing">
                     Add Dependent
                 </jet-button>
             </div>
@@ -44,8 +49,8 @@
                 Close
             </jet-secondary-button>
 
-            <jet-button class="ml-2 focus:ring-offset-gray-100" @click="addEmployee" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                Add
+            <jet-button class="ml-2 focus:ring-offset-gray-100" @click="addOrUpdateEmployee" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                {{ title }}
             </jet-button>
         </template>
     </jet-dialog-modal>
@@ -61,8 +66,9 @@
     import { ref, watchEffect } from '@vue/runtime-core'
 
     export default {
-        props: ['show'],
+        props: ['employee', 'show'],
         emits: ['close'],
+
         components: {
             JetButton,
             JetDialogModal,
@@ -70,24 +76,35 @@
             JetInputError,
             JetSecondaryButton,
         },
+
         setup(props) {
+            const action = ref('Add')
+            const title = ref('Add')
+            const path = ref(route('employee.store'))
             const name = ref(null)
 
             const form = useForm({
-                name: null,
-                dependents: [],
+                name: props.employee?.name || null,
+                dependents: props.employee?.dependents || [],
             })
 
-            const addEmployee = () => form.post(route('employee.store'), {
+            const addOrUpdateEmployee = () => form[action.value](path.value, {
                 preserveState: false,
                 onSuccess: () => form.reset(),
             })
 
-            const addDependent = () => form.dependents.push({name: '', relation: ''})
+            const addDependent = () => form.dependents.push({ name: '', relation: '' })
 
             watchEffect(() => props.show && setTimeout(() => name.value?.focus(), 100))
+            watchEffect(() => {
+                action.value = props.employee ? 'patch' : 'post'
+                title.value = props.employee ? 'Update' : 'Add'
+                path.value = props.employee ? route('employee.update', props.employee.id) : route('employee.store')
+                form.name = props.employee?.name || null
+                form.dependents = props.employee?.dependents || []
+            })
 
-            return { form, name, addEmployee, addDependent }
+            return { path, form, name, addOrUpdateEmployee, addDependent, title }
         },
     }
 </script>

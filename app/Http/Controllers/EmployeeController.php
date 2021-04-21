@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class EmployeeController extends Controller
@@ -18,7 +19,7 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         $team = $request->user()->currentTeam;
-        $totalBenefitCost = Cache::has('total_benefit_cost:'.$team->id) ? Cache::get('total_benefit_cost:'.$team->id) : 0;
+        $totalBenefitCost = $this->getTotalBenefitCost($team);
         $employees = $team->employees();
         $employeesCount = $employees->count();
 
@@ -52,45 +53,48 @@ class EmployeeController extends Controller
         $validated = $request->validate(['name' => 'required', 'dependents' => 'array']);
         $team = $request->user()->currentTeam;
         $employee = $team->employees()->create(['name' => $validated['name'], 'benefit_cost' => $this->benefitCost(1000, $validated['name'])]);
-        $employee->benefit_cost += $this->createDependents($employee, $validated['dependents']);
+        $employee->benefit_cost += $this->updateDependents($employee, $validated['dependents']);
         $employee->save();
         $this->incrementTotalBenefitCost($team->id, $employee->benefit_cost);
 
-        return redirect(route('employee.index'));
+        return redirect()->back();
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Employee  $employee
-     * @return \Illuminate\Http\Response
+     * Update the specified employee in storage.
      */
-    public function update(Request $request, Employee $employee)
+    public function update(Request $request, Employee $employee): RedirectResponse
     {
-        //
+        $validated = $request->validate(['name' => 'required', 'dependents' => 'array']);
+        $team = $request->user()->currentTeam;
+        $this->decrementTotalBenefitCost($team->id, $employee->benefit_cost);
+        $employee->update(['name' => $validated['name'], 'benefit_cost' => $this->benefitCost(1000, $validated['name'])]);
+        $employee->benefit_cost += $this->updateDependents($employee, $validated['dependents']);
+        $employee->save();
+        $this->incrementTotalBenefitCost($team->id, $employee->benefit_cost);
+
+        return redirect()->back();
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Employee  $employee
-     * @return \Illuminate\Http\Response
+     * Remove the specified employee from storage.
      */
-    public function destroy(Employee $employee)
+    public function destroy(Employee $employee): RedirectResponse
     {
         $this->decrementTotalBenefitCost($employee->team_id, $employee->benefit_cost);
         $employee->delete();
 
-        return redirect(route('employee.index'));
+        return redirect()->back();
     }
 
-    protected function createDependents(Employee $employee, array $dependents) {
+    protected function updateDependents(Employee $employee, array $dependents) {
+        $employee->dependents()->delete();
+
         return collect($dependents)->map(function ($dependent) use ($employee) {
             return $employee->dependents()->create([
                 'team_id' => $employee->team_id,
                 'name' => $dependent['name'],
-                'relation' => $dependent['relation']
+                'relation' => $dependent['relation'] ?? 'other',
             ]);
         })->reduce(fn($sum, $dependent) => $sum + $this->benefitCost(500, $dependent['name']));
     }
@@ -98,7 +102,7 @@ class EmployeeController extends Controller
     protected function benefitCost(int $amount, $name) {
         $multiplier = strtoupper(substr($name, 0, 1)) === 'A' ? 0.9 : 1.0;
 
-        return $amount * $multiplier;
+        return $amount * $multiplier * 100;
     }
 
     protected function incrementTotalBenefitCost($id, int $amount) {
@@ -111,5 +115,16 @@ class EmployeeController extends Controller
         $key = 'total_benefit_cost:'.$id;
         if (Cache::has($key)) Cache::decrement($key, $amount);
         else Cache::forever($key, 0);
+    }
+
+    protected function getTotalBenefitCost($team) {
+        if (Cache::has('total_benefit_cost:'.$team->id)) return Cache::get('total_benefit_cost:'.$team->id);
+        
+        $total = $team->employees->reduce(fn($sum, $employee) => $sum + $this->benefitCost(1000, $employee['name']));
+        $total += $team->dependents->reduce(fn($sum, $dependent) => $sum + $this->benefitCost(500, $dependent['name']));
+
+        Cache::forever('total_benefit_cost:'.$team->id, $total);
+
+        return $total;
     }
 }

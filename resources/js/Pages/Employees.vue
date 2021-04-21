@@ -6,7 +6,7 @@
                     Employees
                 </h2>
 
-                <jet-button @click="addingEmployee = !addingEmployee">Add</jet-button>
+                <jet-button @click="showingEmployeeModal = !showingEmployeeModal">Add</jet-button>
             </div>
         </template>
 
@@ -14,33 +14,35 @@
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="grid items-end grid-cols-2 gap-6 px-4 lg:grid-cols-4 sm:px-0">
                     <div class="relative flex items-center col-span-2">
-                        <input class="w-full h-16 pr-6 border-0 rounded-lg shadow-xl pl-14 focus:ring-2 focus:ring-offset-gray-100 focus:ring-offset-2 focus:outline-none focus:ring-blue-300" type="text" placeholder="Search" />
-
                         <svg xmlns="http://www.w3.org/2000/svg" class="absolute w-4 h-4 -mt-px text-gray-400 left-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
+
+                        <input class="w-full h-16 pr-16 border-0 rounded-lg shadow pl-14 focus:ring-2 focus:ring-offset-gray-100 focus:ring-offset-2 focus:outline-none focus:ring-blue-300" type="text" placeholder="Search" ref="search" />
+
+                        <span class="absolute inline-flex items-center justify-center w-6 h-6 text-xs text-gray-500 border border-gray-100 rounded right-6 bg-gray-50">/</span>
                     </div>
 
-                    <div class="flex flex-col justify-center h-16 px-6 bg-white rounded-lg shadow-xl md:items-center md:space-x-3 md:justify-between md:flex-row">
+                    <div class="flex flex-col justify-center h-16 px-6 bg-white rounded-lg shadow md:items-center md:space-x-3 md:justify-between md:flex-row">
                         <span class="text-xs font-semibold tracking-wide text-black uppercase">
                             Average<br />
                         </span>
-                        <h3 class="text-xl font-semibold tracking-wide text-black truncate lg:text-2xl">
-                            ${{ average.toFixed(2) }}<span class="text-[0.5rem]">/yr</span>
+                        <h3 class="relative text-xl font-semibold tracking-wide text-black truncate top-0.5 lg:text-2xl">
+                            ${{ (average / 100).toFixed(2) }}<span class="text-[0.5rem]">/yr</span>
                         </h3>
                     </div>
 
-                    <div class="flex flex-col justify-center h-16 px-6 rounded-lg shadow-xl md:items-center md:space-x-3 md:justify-between md:flex-row bg-gradient-to-br from-blue-300 to-blue-400">
+                    <div class="flex flex-col justify-center h-16 px-6 rounded-lg shadow md:items-center md:space-x-3 md:justify-between md:flex-row bg-gradient-to-br from-blue-300 to-blue-400">
                         <span class="text-xs font-semibold tracking-wide text-white uppercase">
                             Total<br />
                         </span>
-                        <h3 class="text-xl font-semibold tracking-wide text-white truncate lg:text-2xl">
-                            ${{ total.toFixed(2) }}<span class="text-[0.5rem]">/yr</span>
+                        <h3 class="text-xl font-semibold tracking-wide text-white truncate top-0.5 relative lg:text-2xl">
+                            ${{ (total / 100).toFixed(2) }}<span class="text-[0.5rem]">/yr</span>
                         </h3>
                     </div>
                 </div>
 
-                <div class="mt-6 overflow-hidden bg-white shadow-xl sm:rounded-lg">
+                <div class="mt-6 overflow-hidden bg-white shadow sm:rounded-lg">
                     <div v-if="employees.data.length">
                         <div class="grid grid-cols-4 px-6 space-x-2 border-b-2 border-gray-100 md:grid-cols-5">
                             <div class="py-4 pl-[3.25rem] text-xs font-bold tracking-wide text-gray-500 uppercase">Name</div>
@@ -56,12 +58,12 @@
                                     <span class="font-semibold break-words">{{ employee.name }}</span>
                                 </div>
 
-                                <div class="col-span-2 md:col-span-1">${{ employee.benefit_cost }}</div>
+                                <div class="col-span-2 md:col-span-1">${{ (employee.benefit_cost / 100).toFixed(2) }}</div>
 
                                 <div class="hidden md:block md:col-span-2">{{ employee.dependents.length }}</div>
 
                                 <div class="flex items-center justify-end space-x-3">
-                                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" @click="[selectedEmployee = employee, showingEmployeeModal = true]">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
@@ -84,33 +86,46 @@
             </div>
         </div>
 
-        <add-employee :show="addingEmployee" @close="addingEmployee = false" />
+        <employee-modal :employee="selectedEmployee" :show="showingEmployeeModal" @close="[showingEmployeeModal = false, selectedEmployee = null]" />
     </app-layout>
 </template>
 
 <script>
-    import AddEmployee from '@/Shared/AddEmployee'
     import AppLayout from '@/Layouts/AppLayout'
+    import EmployeeModal from '@/Shared/EmployeeModal'
     import JetButton from '@/Jetstream/Button'
     import { ref } from '@vue/reactivity'
     import { Inertia } from '@inertiajs/inertia'
+    import { onMounted, onUnmounted } from '@vue/runtime-core'
+    import hotkeys from 'hotkeys-js'
 
     export default {
         props: ['employees', 'average', 'total'],
 
         components: {
-            AddEmployee,
             AppLayout,
+            EmployeeModal,
             JetButton,
         },
 
         setup() {
-            const addingEmployee = ref(false)
-            const deleteEmployee = employee => {
-                Inertia.delete(route('employee.destroy', employee.id))
-            }
+            const search = ref(null)
+            const showingEmployeeModal = ref(false)
+            const deleteEmployee = employee => Inertia.delete(route('employee.destroy', employee.id))
+            const selectedEmployee = ref(null)
 
-            return { addingEmployee, deleteEmployee }
+            onMounted(() => {
+                hotkeys('/', event => {
+                    search.value?.focus()
+                    event.preventDefault()
+                })
+            })
+
+            onUnmounted(() => {
+                hotkeys.unbind('/')
+            })
+
+            return { search, showingEmployeeModal, deleteEmployee, selectedEmployee }
         }
     }
 </script>
