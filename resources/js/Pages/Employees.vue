@@ -18,7 +18,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
 
-                        <input class="w-full h-16 pr-16 placeholder-gray-400 transition border border-white rounded-lg shadow focus:border-blue-400 pl-14 focus:ring-2 focus:ring-offset-gray-100 focus:ring-offset-2 focus:outline-none focus:ring-blue-300" type="text" placeholder="Search" ref="searchInput" :value="query" @input="[query = $event.target.value, search()]" />
+                        <input class="w-full h-16 pr-16 placeholder-gray-400 transition border border-white rounded-lg shadow focus:border-orange-400 pl-14 focus:ring-2 focus:ring-offset-gray-100 focus:ring-offset-2 focus:outline-none focus:ring-orange-300" type="text" placeholder="Search" ref="searchInput" :value="query" @input="[query = $event.target.value, search()]" />
 
                         <span class="absolute inline-flex items-center justify-center w-6 h-6 text-xs text-gray-500 border border-gray-100 rounded right-6 bg-gray-50">/</span>
                     </div>
@@ -78,7 +78,7 @@
                                 </div>
 
                                 <div class="flex items-center justify-end space-x-3 sm:col-span-2">
-                                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" @click="[selectedEmployee = employee, showingEmployeeModal = true]">
+                                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-300" @click="[selectedEmployee = employee, showingEmployeeModal = true]">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>

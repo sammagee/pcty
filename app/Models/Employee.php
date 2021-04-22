@@ -25,4 +25,14 @@ class Employee extends Model
     {
         return $this->hasMany(Dependent::class);
     }
+
+    /**
+     * Get the default profile photo URL if no profile photo has been uploaded.
+     *
+     * @return string
+     */
+    protected function defaultProfilePhotoUrl()
+    {
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&color=F97316&background=FED7AA';
+    }
 }
