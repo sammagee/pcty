@@ -44,22 +44,22 @@
 
                 <div class="mt-6 overflow-hidden bg-white shadow sm:rounded-lg">
                     <div v-if="employees.data.length">
-                        <div class="grid grid-cols-5 px-6 space-x-2 border-b-2 border-gray-100 md:grid-cols-6">
+                        <div class="grid grid-cols-4 px-6 space-x-2 border-b-2 border-gray-100 sm:grid-cols-5 md:grid-cols-6">
                             <div class="py-4 sm:pl-[3.25rem] text-xs font-bold tracking-wide text-gray-500 uppercase">Name</div>
-                            <div class="py-4 text-xs font-bold tracking-wide text-right text-gray-500 uppercase">Gross Pay</div>
+                            <div class="hidden py-4 text-xs font-bold tracking-wide text-right text-gray-500 uppercase sm:block">Gross Pay</div>
                             <div class="py-4 text-xs font-bold tracking-wide text-right text-gray-500 uppercase">Benefit Cost</div>
                             <div class="py-4 text-xs font-bold tracking-wide text-right text-gray-500 uppercase">Net Pay</div>
                         </div>
 
                         <div class="divide-y divide-gray-100">
-                            <div class="grid items-center grid-cols-5 px-6 py-4 space-x-2 md:grid-cols-6" v-for="employee in employees.data" :key="employee.id">
+                            <div class="grid items-center grid-cols-4 px-6 py-4 space-x-2 sm:grid-cols-5 md:grid-cols-6" v-for="employee in employees.data" :key="employee.id">
                                 <div class="flex h-full sm:items-center sm:space-x-3">
                                     <img class="hidden object-cover w-10 h-10 rounded-full sm:block" :src="employee.profile_photo_url" :alt="employee.name" />
 
                                     <span class="font-semibold break-words">{{ employee.name }}</span>
                                 </div>
 
-                                <div class="col-span-1 text-right">
+                                <div class="hidden col-span-1 text-right sm:block">
                                     <span>${{ (2000).toFixed(2) }}<span class="text-[0.5rem]">/pd</span></span>
                                     <br />
                                     <span class="text-xs text-gray-600">${{ (2000 * 26).toFixed(2) }}<span class="text-[0.5rem]">/yr</span></span>
@@ -77,7 +77,7 @@
                                     <span class="text-xs text-gray-600">${{ (((2000 * 26 * 100) - employee.benefit_cost) / 100).toFixed(2) }}<span class="text-[0.5rem]">/yr</span></span>
                                 </div>
 
-                                <div class="flex items-center justify-end space-x-3 sm:col-span-2">
+                                <div class="flex items-center justify-end space-x-3 md:col-span-2">
                                     <button class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-300" @click="[selectedEmployee = employee, showingEmployeeModal = true]">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

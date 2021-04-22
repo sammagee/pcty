@@ -45,7 +45,7 @@
         </template>
 
         <template #footer>
-            <jet-secondary-button class="focus:ring-offset-gray-100" @click="$emit('close')">
+            <jet-secondary-button class="focus:ring-offset-gray-100" @click="[form.reset(), $emit('close')]">
                 Close
             </jet-secondary-button>
 
@@ -63,7 +63,7 @@
     import JetInputError from '@/Jetstream/InputError'
     import JetSecondaryButton from '@/Jetstream/SecondaryButton'
     import { useForm } from '@inertiajs/inertia-vue3'
-    import { ref, watchEffect } from '@vue/runtime-core'
+    import { ref, toRef, watchEffect } from '@vue/runtime-core'
 
     export default {
         props: ['employee', 'show'],
