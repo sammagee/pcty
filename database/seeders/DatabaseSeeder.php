@@ -15,13 +15,18 @@ class DatabaseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(int $number, bool $withUser)
     {
-        $user = User::factory()->withTeam('PCTY')->create(['email' => 'hi@sammagee.me', 'name' => 'Sam']);
-        $user->current_team_id = Team::where('user_id', $user->id)->first()->id;
-        $user->save();
+        if ($withUser) {
+            $user = User::factory()->withTeam('PCTY')->create(['email' => 'hi@sammagee.me', 'name' => 'Sam']);
+            $user->current_team_id = Team::where('user_id', $user->id)->first()->id;
+            $user->save();
+        } else {
+            $user = User::first();
+        }
+
         $team = $user->currentTeam;
-        $team->employees()->saveMany(Employee::factory(500)->make());
+        $team->employees()->saveMany(Employee::factory($number)->make());
         $team->employees->each(function ($employee) use ($team) {
             $dependents = Dependent::factory(mt_rand(0, 5))->create(['employee_id' => $employee->id, 'team_id' => $team->id]);
             $dependents_cost = $dependents->reduce(function ($sum, $dependent) {
