@@ -52,6 +52,9 @@ At this point you should be able to open [`localhost`](http://localhost) in your
 
 ## Usage
 
+### View mail locally
+With the default configuration, a [MailHog](https://github.com/mailhog/MailHog) server will be running in the background when you start the server with the instructions above. In order to view the web interface for this, you will need to go to [`localhost:8025`](http://localhost:8025/). Here, you will be able to access emails sent locally (i.e. email verification emails).
+
 ### Start/Stop the server
 Start:
 ```
