@@ -32,12 +32,17 @@ class EmployeeController extends Controller
                 ->through(fn ($employee) => [
                     'id' => $employee->id,
                     'name' => $employee->name,
-                    'benefit_cost' => $employee->benefit_cost,
+                    'gross_pay_per_period' => $employee->gross_pay / 26 / 100,
+                    'gross_pay_per_year' => $employee->gross_pay / 100,
+                    'benefit_cost_per_period' => $employee->benefit_cost / 26 / 100,
+                    'benefit_cost_per_year' => $employee->benefit_cost / 100,
+                    'net_pay_per_period' => $employee->gross_pay / 26 / 100 - $employee->benefit_cost / 26 / 100,
+                    'net_pay_per_year' => $employee->gross_pay / 100 - $employee->benefit_cost / 100,
                     'profile_photo_url' => $employee->profile_photo_url,
                     'dependents' => $employee->dependents,
                 ]),
-            'average' => $employeesCount > 0 ? $totalBenefitCost / $employeesCount : $totalBenefitCost,
-            'total' => $totalBenefitCost,
+            'average' => ($employeesCount > 1 ? $totalBenefitCost / $employeesCount : $totalBenefitCost) / 100,
+            'total' => $totalBenefitCost / 100,
         ]);
     }
 

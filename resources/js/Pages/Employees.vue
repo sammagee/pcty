@@ -28,7 +28,7 @@
                             Average<br />
                         </span>
                         <h3 class="relative text-xl font-semibold tracking-wide text-black truncate top-0.5 lg:text-2xl">
-                            ${{ (average / 100).toFixed(2) }}<span class="text-[0.5rem]">/yr</span>
+                            ${{ average.toFixed(2) }}<span class="text-[0.5rem]">/yr</span>
                         </h3>
                     </div>
 
@@ -37,7 +37,7 @@
                             Total<br />
                         </span>
                         <h3 class="text-xl font-semibold tracking-wide text-white truncate top-0.5 relative lg:text-2xl">
-                            ${{ (total / 100).toFixed(2) }}<span class="text-[0.5rem]">/yr</span>
+                            ${{ total.toFixed(2) }}<span class="text-[0.5rem]">/yr</span>
                         </h3>
                     </div>
                 </div>
@@ -60,21 +60,21 @@
                                 </div>
 
                                 <div class="hidden col-span-1 text-right sm:block">
-                                    <span>${{ (2000).toFixed(2) }}<span class="text-[0.5rem]">/pd</span></span>
+                                    <span>${{ employee.gross_pay_per_period.toFixed(2) }}<span class="text-[0.5rem]">/pd</span></span>
                                     <br />
-                                    <span class="text-xs text-gray-600">${{ (2000 * 26).toFixed(2) }}<span class="text-[0.5rem]">/yr</span></span>
+                                    <span class="text-xs text-gray-600">${{ employee.gross_pay_per_year.toFixed(2) }}<span class="text-[0.5rem]">/yr</span></span>
                                 </div>
 
                                 <div class="col-span-1 text-right">
-                                    <span>${{ (employee.benefit_cost / 26 / 100).toFixed(2) }}<span class="text-[0.5rem]">/pd</span></span>
+                                    <span>${{ employee.benefit_cost_per_period.toFixed(2) }}<span class="text-[0.5rem]">/pd</span></span>
                                     <br />
-                                    <span class="text-xs text-gray-600">${{ (employee.benefit_cost / 100).toFixed(2) }}<span class="text-[0.5rem]">/yr</span></span>
+                                    <span class="text-xs text-gray-600">${{ employee.benefit_cost_per_year.toFixed(2) }}<span class="text-[0.5rem]">/yr</span></span>
                                 </div>
 
                                 <div class="col-span-1 text-right">
-                                    <span>${{ (((2000 * 100) - (employee.benefit_cost / 26)) / 100).toFixed(2) }}<span class="text-[0.5rem]">/pd</span></span>
+                                    <span>${{ employee.net_pay_per_period.toFixed(2) }}<span class="text-[0.5rem]">/pd</span></span>
                                     <br />
-                                    <span class="text-xs text-gray-600">${{ (((2000 * 26 * 100) - employee.benefit_cost) / 100).toFixed(2) }}<span class="text-[0.5rem]">/yr</span></span>
+                                    <span class="text-xs text-gray-600">${{ employee.net_pay_per_year.toFixed(2) }}<span class="text-[0.5rem]">/yr</span></span>
                                 </div>
 
                                 <div class="flex items-center justify-end space-x-3 md:col-span-2">

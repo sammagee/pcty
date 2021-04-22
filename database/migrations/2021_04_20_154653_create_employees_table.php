@@ -19,6 +19,7 @@ class CreateEmployeesTable extends Migration
                 ->constrained()
                 ->onDelete('cascade');
             $table->string('name');
+            $table->integer('gross_pay')->default(2000 * 100 * 26)->nullable();
             $table->integer('benefit_cost')->nullable();
             $table->text('profile_photo_path')->nullable();
             $table->timestamps();
