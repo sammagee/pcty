@@ -27,7 +27,7 @@ class EmployeeController extends Controller
                 ->where('team_id', $team->id)
                 ->orderBy('name')
                 ->query(fn ($employee) => $employee->with('dependents'))
-                ->paginate(1)
+                ->paginate()
                 ->withQueryString()
                 ->through(fn ($employee) => [
                     'id' => $employee->id,

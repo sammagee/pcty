@@ -66,4 +66,24 @@ class UserFactory extends Factory
             'ownedTeams'
         );
     }
+
+    /**
+     * Indicate that the user should have a team.
+     *
+     * @return $this
+     */
+    public function withTeam(string $name)
+    {
+        if (! Features::hasTeamFeatures()) {
+            return $this->state([]);
+        }
+
+        return $this->has(
+            Team::factory()
+                ->state(function (array $attributes, User $user) use ($name) {
+                    return ['name' => $name, 'user_id' => $user->id, 'personal_team' => false];
+                }),
+            'ownedTeams'
+        );
+    }
 }

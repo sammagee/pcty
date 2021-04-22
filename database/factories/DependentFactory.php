@@ -21,8 +21,12 @@ class DependentFactory extends Factory
      */
     public function definition()
     {
+        $name = $this->faker->name;
+        $multiplier = strtoupper(substr($name, 0, 1)) === 'A' ? 0.9 : 1.0;
+
         return [
-            //
+            'name' => $name,
+            'relation' => $this->faker->randomElement(['spouse', 'child', 'other']),
         ];
     }
 }

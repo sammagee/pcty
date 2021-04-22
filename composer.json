@@ -19,11 +19,13 @@
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {
+        "brianium/paratest": "^6.2",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
+        "pestphp/pest": "^1.0",
         "phpunit/phpunit": "^9.3.3"
     },
     "autoload": {
